@@ -8,19 +8,16 @@
 # Install required libs
 chef_gem 'wmi-lite' do
   version '1.0'
-  compile_time true
   action :install
 end
+require 'wmi-lite'
 
 chef_gem 'http' do
   version '3.3'
-  compile_time true
   action :install
 end
-
-# Import required libs
 require 'http'
-require 'wmi-lite'
+
 
 # Our functions
 def get_asset_by_serial(base_url, token, serial)
