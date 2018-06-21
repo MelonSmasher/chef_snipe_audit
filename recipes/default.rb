@@ -21,28 +21,28 @@ require 'wmi-lite'
 # Our functions
 def get_asset_by_serial(base_url, token, serial)
   require 'http'
-  HTTP[:accept => "application/json"]
+  HTTP.headers({:accept => "application/json"})
       .auth("Bearer #{token}")
       .get("#{base_url}/hardware/byserial/#{serial}")
 end
 
 def get_asset_models(base_url, token)
   require 'http'
-  HTTP[:accept => "application/json"]
+  HTTP.headers({:accept => "application/json"})
       .auth("Bearer #{token}")
       .get("#{base_url}/models?limit=500&sort=id&order=asc")
 end
 
 def post_asset(base_url, token, data)
   require 'http'
-  HTTP["Content-Type" => "application/json"]
+  HTTP.headers({"Content-Type" => "application/json"})
       .auth("Bearer #{token}")
       .patch("#{base_url}/hardware", :json => data)
 end
 
 def patch_asset(base_url, token, data, id)
   require 'http'
-  HTTP["Content-Type" => "application/json"]
+  HTTP.headers({"Content-Type" => "application/json"})
       .auth("Bearer #{token}")
       .patch("#{base_url}/hardware/#{id}", :json => data)
 end
