@@ -96,14 +96,24 @@ if node['platform_family'].to_s.downcase === 'windows' and RUBY_PLATFORM =~ /msw
     models_response = get_asset_models(base_url, token)
     this_asset_response = get_asset_by_serial(base_url, token, serial)
 
+    log 'Snipe Audit' do
+      message models_response.body.to_s
+      level :debug
+    end
+
+    log 'Snipe Audit' do
+      message this_asset_response.body.to_s
+      level :debug
+    end
+
     # Make sure that there is a list of models to pick from
-    if models_response.body['total'] > 0
+    if models_response.body['total'].to_i > 0
       # Make sure that there is at most 1 asset to choose from based on the serial
-      if this_asset_response.body['total'] <= 1
+      if this_asset_response.body['total'].to_i <= 1
 
         # Parse the bodies returned from Snipe
         models = models_response.body['rows']
-        this_asset = this_asset_response.body['total'].equal?(1) ? this_asset_response.body['rows'][0] : nil
+        this_asset = this_asset_response.body['total'].to_i.equal?(1) ? this_asset_response.body['rows'][0] : nil
 
         # Determine the Snipe model id based on the detected model string
         model_id = get_model_id_from_model_number(models, model_number)
