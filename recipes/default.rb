@@ -6,8 +6,8 @@
 #
 
 # Install required libs
-chef_gem 'http' do
-  version '3.3'
+chef_gem 'httparty' do
+  version '0.16.2'
   compile_time true
   action :install
 end
@@ -16,35 +16,42 @@ chef_gem 'wmi-lite' do
   compile_time true
   action :install
 end
+require 'httparty'
 require 'wmi-lite'
 
 # Our functions
 def get_asset_by_serial(base_url, token, serial)
-  require 'http'
-  HTTP.headers({:accept => "application/json"})
-      .auth("Bearer #{token}")
-      .get("#{base_url}/hardware/byserial/#{serial}")
+  HTTParty.get(
+      "#{base_url}/hardware/byserial/#{serial}",
+      verify: false,
+      :headers => {"Authorization" => "Bearer #{token}", "Accept" => "application/json"}
+  )
 end
 
 def get_asset_models(base_url, token)
-  require 'http'
-  HTTP.headers({:accept => "application/json"})
-      .auth("Bearer #{token}")
-      .get("#{base_url}/models?limit=500&sort=id&order=asc")
+  HTTParty.get(
+      "#{base_url}/models?limit=500&sort=id&order=asc",
+      verify: false,
+      :headers => {"Authorization" => "Bearer #{token}", "Accept" => "application/json"}
+  )
 end
 
 def post_asset(base_url, token, data)
-  require 'http'
-  HTTP.headers({"Content-Type" => "application/json"})
-      .auth("Bearer #{token}")
-      .patch("#{base_url}/hardware", :json => data)
+  HTTParty.patch(
+      "#{base_url}/hardware",
+      verify: false,
+      :body => data,
+      :headers => {"Authorization" => "Bearer #{token}", "Content-Type" => "application/json"}
+  )
 end
 
 def patch_asset(base_url, token, data, id)
-  require 'http'
-  HTTP.headers({"Content-Type" => "application/json"})
-      .auth("Bearer #{token}")
-      .patch("#{base_url}/hardware/#{id}", :json => data)
+  HTTParty.patch(
+      "#{base_url}/hardware/#{id}",
+      verify: false,
+      :body => data,
+      :headers => {"Authorization" => "Bearer #{token}", "Content-Type" => "application/json"}
+  )
 end
 
 def get_model_id_from_model_number(models, model_name)
