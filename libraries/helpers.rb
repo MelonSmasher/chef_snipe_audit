@@ -1,3 +1,9 @@
+chef_gem 'http' do
+  version '3.3'
+  compile_time true
+  action :install
+end
+
 require 'http'
 
 def get_asset_by_serial(base_url, token, serial)

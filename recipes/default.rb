@@ -14,16 +14,6 @@ if node['platform_family'].to_s.downcase === 'windows' and RUBY_PLATFORM =~ /msw
     compile_time true
     action :install
   end
-  chef_gem 'json' do
-    version '2.1'
-    compile_time true
-    action :install
-  end
-  chef_gem 'http' do
-    version '3.3'
-    compile_time true
-    action :install
-  end
 
   # Import required libs
   require '../libraries/helpers'
