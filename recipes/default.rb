@@ -67,7 +67,7 @@ end
 if node['platform_family'].to_s.downcase === 'windows' and RUBY_PLATFORM =~ /mswin|mingw32|windows/
 
   # Store Snipe info in vars for later
-  base_url = build_base_url(node['snipe']['host_name'], node['snipe']['port'], node['snipe']['use_https'])
+  base_url = build_base_url(node['snipe']['server']['host_name'], node['snipe']['server']['port'], node['snipe']['server']['use_https'])
   token = node['snipe']['user']['api_token']
   os_name_field = node['snipe']['fields']['os']['name']
   os_version_field = node['snipe']['fields']['os']['version']
