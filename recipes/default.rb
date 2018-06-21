@@ -6,39 +6,42 @@
 #
 
 # Install required libs
+chef_gem 'http' do
+  version '3.3'
+  compile_time true
+  action :install
+end
 chef_gem 'wmi-lite' do
   version '1.0'
+  compile_time true
   action :install
 end
 require 'wmi-lite'
 
-chef_gem 'http' do
-  version '3.3'
-  action :install
-end
-require 'http'
-
-
 # Our functions
 def get_asset_by_serial(base_url, token, serial)
+  require 'http'
   HTTP[:accept => "application/json"]
       .auth("Bearer #{token}")
       .get("#{base_url}/hardware/byserial/#{serial}")
 end
 
 def get_asset_models(base_url, token)
+  require 'http'
   HTTP[:accept => "application/json"]
       .auth("Bearer #{token}")
       .get("#{base_url}/models?limit=500&sort=id&order=asc")
 end
 
 def post_asset(base_url, token, data)
+  require 'http'
   HTTP["Content-Type" => "application/json"]
       .auth("Bearer #{token}")
       .patch("#{base_url}/hardware", :json => data)
 end
 
 def patch_asset(base_url, token, data, id)
+  require 'http'
   HTTP["Content-Type" => "application/json"]
       .auth("Bearer #{token}")
       .patch("#{base_url}/hardware/#{id}", :json => data)
