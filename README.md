@@ -32,3 +32,18 @@ A Chef cookbook that will automatically send Windows PC information to your Snip
   }
 }
 ```
+
+## Usage
+
+### snipe_audit::default
+
+Just include `snipe_audit` in your node's `run_list`:
+
+```json
+{
+  "name":"my_node",
+  "run_list": [
+    "recipe[snipe_audit]"
+  ]
+}
+```
