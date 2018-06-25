@@ -23,34 +23,34 @@ require 'wmi-lite'
 def get_asset_by_serial(base_url, headers, serial)
   HTTParty.get(
       "#{base_url}/hardware/byserial/#{serial}",
-      headers: headers,
-      verify: false
+      :headers => headers,
+      :verify => false
   )
 end
 
 def get_asset_models(base_url, headers)
   HTTParty.get(
       "#{base_url}/models?limit=500&sort=id&order=asc",
-      headers: headers,
-      verify: false
+      :headers => headers,
+      :verify => false
   )
 end
 
 def post_asset(base_url, headers, data)
   HTTParty.post(
       "#{base_url}/hardware",
-      headers: headers,
-      body: data,
-      verify: false
+      :headers => headers,
+      :body => data,
+      :verify => false
   )
 end
 
 def patch_asset(base_url, headers, data, id)
   HTTParty.patch(
       "#{base_url}/hardware/#{id}",
-      headers: headers,
-      body: data,
-      verify: false
+      :headers => headers,
+      :body => data,
+      :verify => false
   )
 end
 
@@ -79,10 +79,10 @@ if node['platform_family'].to_s.downcase === 'windows' and RUBY_PLATFORM =~ /msw
   os_name_field = node['snipe']['fields']['os']['name']
   os_version_field = node['snipe']['fields']['os']['version']
   headers = {
-      :Authorization => "Bearer #{token}",
-      :Accept => "application/json",
+      "Authorization" => "Bearer " + token,
+      "Accept" => "application/json",
       "Content-Type" => "application/json"
-  }
+  }.to_h
 
   # Ensure we have some basic information
   if base_url and !token.empty?
