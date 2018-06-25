@@ -100,24 +100,14 @@ if node['platform_family'].to_s.downcase === 'windows' and RUBY_PLATFORM =~ /msw
     models_response = get_asset_models(base_url, headers)
     this_asset_response = get_asset_by_serial(base_url, headers, serial)
 
-    log 'Snipe Audit' do
-      message models_response.body.to_s
-      level :debug
-    end
-
-    log 'Snipe Audit' do
-      message this_asset_response.body.to_s
-      level :debug
-    end
-
     # Make sure that there is a list of models to pick from
-    if models_response.body['total'].to_i > 0
+    if models_response['total'].to_i > 0
       # Make sure that there is at most 1 asset to choose from based on the serial
-      if this_asset_response.body['total'].to_i <= 1
+      if this_asset_response['total'].to_i <= 1
 
         # Parse the bodies returned from Snipe
-        models = models_response.body['rows']
-        this_asset = this_asset_response.body['total'].to_i.equal?(1) ? this_asset_response.body['rows'][0] : nil
+        models = models_response['rows']
+        this_asset = this_asset_response['total'].to_i.equal?(1) ? this_asset_response['rows'][0] : nil
 
         # Determine the Snipe model id based on the detected model string
         model_id = get_model_id_from_model_number(models, model_number)
@@ -148,22 +138,22 @@ if node['platform_family'].to_s.downcase === 'windows' and RUBY_PLATFORM =~ /msw
           end
 
           # Log the status and response from Snipe
-          if response.body['status'].to_s.eql?('error')
-            response.body['messages'].each do |message|
+          if response['status'].to_s.eql?('error')
+            response['messages'].each do |message|
               message.each_with_index {|key, value|
                 log 'Snipe Audit' do
                   message "#{key}: #{value}"
                   level :error
                 end}
             end
-          elsif response.body['status'].to_s.eql?('success')
+          elsif response['status'].to_s.eql?('success')
             log 'Snipe Audit' do
-              message response.body['messages'].to_s
+              message response['messages'].to_s
               level :info
             end
           else
             log 'Snipe Audit' do
-              message "Status: #{response.body['status'].to_s}"
+              message "Status: #{response['status'].to_s}"
               level :warn
             end
           end
