@@ -77,7 +77,7 @@ if node['platform_family'].to_s.downcase === 'windows' and RUBY_PLATFORM =~ /msw
   token = node['snipe']['user']['api_token']
   os_name_field = node['snipe']['fields']['os']['name']
   os_version_field = node['snipe']['fields']['os']['version']
-  new_asset_status_id = node['snipe']['new_asset_status']['id']
+  new_asset_status_id = node['snipe']['fields']['new_asset_status']['id']
   headers = {
       "Authorization" => "Bearer " + token,
       "Accept" => "application/json",
