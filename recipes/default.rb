@@ -138,7 +138,7 @@ if node['platform_family'].to_s.downcase === 'windows' and RUBY_PLATFORM =~ /msw
         end
 
         # Log the status and response from Snipe
-        if response['status'].to_s.eql?('error')
+        if response['status'].to_s == 'error'
           response['messages'].each do |message|
             message.each_with_index {|key, value|
               log 'Snipe Audit' do
@@ -146,7 +146,7 @@ if node['platform_family'].to_s.downcase === 'windows' and RUBY_PLATFORM =~ /msw
                 level :error
               end}
           end
-        elsif response['status'].to_s.eql?('success')
+        elsif response['status'].to_s == 'success'
           log 'Snipe Audit' do
             message response['messages'].to_s
             level :info
