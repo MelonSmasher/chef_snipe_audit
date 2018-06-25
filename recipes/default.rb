@@ -20,37 +20,37 @@ require 'httparty'
 require 'wmi-lite'
 
 # Our functions
-def get_asset_by_serial(base_url, token, serial)
+def get_asset_by_serial(base_url, headers, serial)
   HTTParty.get(
       "#{base_url}/hardware/byserial/#{serial}",
-      verify: false,
-      headers: {:Authorization => "Bearer #{token}", :Accept => "application/json", "Content-Type" => "application/json"}
+      headers: headers,
+      verify: false
   )
 end
 
-def get_asset_models(base_url, token)
+def get_asset_models(base_url, headers)
   HTTParty.get(
       "#{base_url}/models?limit=500&sort=id&order=asc",
-      verify: false,
-      headers: {:Authorization => "Bearer #{token}", :Accept => "application/json", "Content-Type" => "application/json"}
+      headers: headers,
+      verify: false
   )
 end
 
-def post_asset(base_url, token, data)
-  HTTParty.patch(
+def post_asset(base_url, headers, data)
+  HTTParty.post(
       "#{base_url}/hardware",
-      verify: false,
+      headers: headers,
       body: data,
-      headers: {:Authorization => "Bearer #{token}", :Accept => "application/json", "Content-Type" => "application/json"}
+      verify: false
   )
 end
 
-def patch_asset(base_url, token, data, id)
+def patch_asset(base_url, headers, data, id)
   HTTParty.patch(
       "#{base_url}/hardware/#{id}",
-      verify: false,
+      headers: headers,
       body: data,
-      headers: {:Authorization => "Bearer #{token}", :Accept => "application/json", "Content-Type" => "application/json"}
+      verify: false
   )
 end
 
@@ -81,6 +81,12 @@ if node['platform_family'].to_s.downcase === 'windows' and RUBY_PLATFORM =~ /msw
 
   # Ensure we have some basic information
   if base_url and !token.empty?
+
+    headers = {
+        "Authorization" => "Bearer #{token}",
+        "Accept" => "application/json",
+        "Content-Type" => "application/json"
+    }
 
     # Make a new WMI interface
     wmi = WmiLite::Wmi.new
@@ -178,7 +184,7 @@ if node['platform_family'].to_s.downcase === 'windows' and RUBY_PLATFORM =~ /msw
       end
     else
       log 'Snipe Audit' do
-        message "Found no models in Snipe. #{models_response.to_s}"
+        message "Found no models in Snipe. #{models_response.to_s} - #{headers.to_s}"
         level :warn
       end
     end
