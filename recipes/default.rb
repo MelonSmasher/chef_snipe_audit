@@ -29,10 +29,9 @@ def get_asset_by_serial(base_url, headers, serial)
 end
 
 def get_asset_models(base_url, headers)
-  HTTParty.get(
-      "#{base_url}/models?limit=500&sort=id&order=asc",
-      :headers => headers,
-      :verify => false
+  HTTParty.get("#{base_url}/models?limit=500&sort=id&order=asc",
+               :headers => headers,
+               :verify => false
   )
 end
 
@@ -67,7 +66,7 @@ def build_base_url(hostname, port, use_https)
   if hostname.to_s.empty? or port.to_s.empty?
     return false
   end
-  use_https ? "https://#{hostname}:#{port.to_s}" : "http://#{hostname}:#{port.to_s}"
+  use_https ? "https://#{hostname}:#{port.to_s}/api/v1" : "http://#{hostname}:#{port.to_s}/api/v1"
 end
 
 # Make sure we are on Windows
