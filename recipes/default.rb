@@ -69,6 +69,10 @@ def build_base_url(hostname, port, use_https)
   use_https ? "https://#{hostname}:#{port.to_s}/api/v1" : "http://#{hostname}:#{port.to_s}/api/v1"
 end
 
+def get_remote_ip_info
+  HTTParty.get('http://ifconfig.co/json', :verify => false)
+end
+
 # Make sure we are on Windows
 if node['platform_family'].to_s.downcase === 'windows' and RUBY_PLATFORM =~ /mswin|mingw32|windows/
 
@@ -78,6 +82,11 @@ if node['platform_family'].to_s.downcase === 'windows' and RUBY_PLATFORM =~ /msw
   os_name_field = node['snipe']['fields']['os']['name']
   os_version_field = node['snipe']['fields']['os']['version']
   new_asset_status_id = node['snipe']['fields']['new_asset_status']['id']
+  gather_remote = node['snipe']['fields']['remote']['gather']
+  remote_ip_field = node['snipe']['fields']['remote']['ip']
+  remote_host_field = node['snipe']['fields']['remote']['hostname']
+  remote_country_field = node['snipe']['fields']['remote']['country']
+  remote_city_field = node['snipe']['fields']['remote']['city']
   headers = {
       "Authorization" => "Bearer " + token,
       "Accept" => "application/json",
@@ -127,6 +136,25 @@ if node['platform_family'].to_s.downcase === 'windows' and RUBY_PLATFORM =~ /msw
           end
           if os_version_field
             asset[os_version_field.to_s] = os_ver
+          end
+
+          # If we should gather remote IP info
+          if gather_remote
+            # Get the info
+            remote = get_remote_ip_info
+            # Fill out any fields that are active
+            if remote_ip_field
+              asset[remote_ip_field.to_s] = remote['ip']
+            end
+            if remote_host_field
+              asset[remote_host_field.to_s] = remote['hostname']
+            end
+            if remote_country_field
+              asset[remote_country_field.to_s] = remote['country']
+            end
+            if remote_city_field
+              asset[remote_city_field.to_s] = remote['city']
+            end
           end
 
           # If the asset does not already exist in Snipe
