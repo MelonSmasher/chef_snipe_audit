@@ -39,7 +39,7 @@ def post_asset(base_url, headers, data)
   HTTParty.post(
       "#{base_url}/hardware",
       :headers => headers,
-      :body => data,
+      :body => data.to_json,
       :verify => false
   )
 end
@@ -48,14 +48,14 @@ def patch_asset(base_url, headers, data, id)
   HTTParty.patch(
       "#{base_url}/hardware/#{id}",
       :headers => headers,
-      :body => data,
+      :body => data.to_json,
       :verify => false
   )
 end
 
 def get_model_id_from_model_number(models, model_name)
   models.each do |model|
-    if model['model_number'].equal?(model_name)
+    if model['model_number'].to_s == model_name.to_s
       return model['id']
     end
   end
@@ -115,76 +115,76 @@ if node['platform_family'].to_s.downcase === 'windows' and RUBY_PLATFORM =~ /msw
         # Were we able to get the model id?
         if !model_id.nil?
 
-          # Build the asset data obj
-          asset = {
-              :serial => serial,
-              :name => hostname,
-              :model_id => model_id
-          }
-          if os_name_field
-            asset[os_name_field.to_s] = os
-          end
-          if os_version_field
-            asset[os_version_field.to_s] = os_ver
-          end
+        # Build the asset data obj
+        asset = {
+            :serial => serial,
+            :name => hostname,
+            :model_id => model_id
+        }
+        if os_name_field
+          asset[os_name_field.to_s] = os
+        end
+        if os_version_field
+          asset[os_version_field.to_s] = os_ver
+        end
 
-          # If the asset does not already exist in Snipe
-          if this_asset.nil?
-            # Post a new asset
-            response = post_asset(base_url, headers, asset)
-          else
-            # Update the asset
-            response = patch_asset(base_url, headers, asset, this_asset['id'])
-          end
+        # If the asset does not already exist in Snipe
+        if this_asset.nil?
+          # Post a new asset
+          response = post_asset(base_url, headers, asset)
+        else
+          # Update the asset
+          response = patch_asset(base_url, headers, asset, this_asset['id'])
+        end
 
-          # Log the status and response from Snipe
-          if response['status'].to_s.eql?('error')
-            response['messages'].each do |message|
-              message.each_with_index {|key, value|
-                log 'Snipe Audit' do
-                  message "#{key}: #{value}"
-                  level :error
-                end}
-            end
-          elsif response['status'].to_s.eql?('success')
-            log 'Snipe Audit' do
-              message response['messages'].to_s
-              level :info
-            end
-          else
-            log 'Snipe Audit' do
-              message "Status: #{response['status'].to_s}"
-              level :warn
-            end
+        # Log the status and response from Snipe
+        if response['status'].to_s.eql?('error')
+          response['messages'].each do |message|
+            message.each_with_index {|key, value|
+              log 'Snipe Audit' do
+                message "#{key}: #{value}"
+                level :error
+              end}
           end
-
+        elsif response['status'].to_s.eql?('success')
+          log 'Snipe Audit' do
+            message response['messages'].to_s
+            level :info
+          end
         else
           log 'Snipe Audit' do
-            message "Unable to match this model: #{model_number} to one in Snipe."
+            message "Status: #{response['status'].to_s}"
             level :warn
           end
         end
+
       else
         log 'Snipe Audit' do
-          message "Found more than one asset in Snipe with this serial number: #{serial} ensure that all serial numbers are unique!"
+          message "Unable to match this model: #{model_number} to one in Snipe."
           level :warn
         end
       end
     else
       log 'Snipe Audit' do
-        message "Found no models in Snipe. #{models_response.to_s} - #{headers.to_s}"
+        message "Found more than one asset in Snipe with this serial number: #{serial} ensure that all serial numbers are unique!"
         level :warn
       end
     end
   else
     log 'Snipe Audit' do
-      message "The snipe server is not configured in Chef."
+      message "Found no models in Snipe. #{models_response.to_s}"
       level :warn
     end
   end
 else
   log 'Snipe Audit' do
-    message "The platform family: #{node['platform_family']} is not supported at this time."
+    message "The snipe server is not configured in Chef."
     level :warn
   end
+end
+else
+log 'Snipe Audit' do
+  message "The platform family: #{node['platform_family']} is not supported at this time."
+  level :warn
+end
 end
