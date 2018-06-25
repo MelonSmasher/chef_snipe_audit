@@ -78,15 +78,14 @@ if node['platform_family'].to_s.downcase === 'windows' and RUBY_PLATFORM =~ /msw
   token = node['snipe']['user']['api_token']
   os_name_field = node['snipe']['fields']['os']['name']
   os_version_field = node['snipe']['fields']['os']['version']
+  headers = {
+      :Authorization => "Bearer #{token}",
+      :Accept => "application/json",
+      "Content-Type" => "application/json"
+  }
 
   # Ensure we have some basic information
   if base_url and !token.empty?
-
-    headers = {
-        "Authorization" => "Bearer #{token}",
-        "Accept" => "application/json",
-        "Content-Type" => "application/json"
-    }
 
     # Make a new WMI interface
     wmi = WmiLite::Wmi.new
@@ -99,8 +98,8 @@ if node['platform_family'].to_s.downcase === 'windows' and RUBY_PLATFORM =~ /msw
     model_number = wmi.first_of('Win32_ComputerSystem')['model'].to_s
 
     # Get info from Snipe
-    models_response = get_asset_models(base_url, token)
-    this_asset_response = get_asset_by_serial(base_url, token, serial)
+    models_response = get_asset_models(base_url, headers)
+    this_asset_response = get_asset_by_serial(base_url, headers, serial)
 
     log 'Snipe Audit' do
       message models_response.body.to_s
@@ -128,25 +127,25 @@ if node['platform_family'].to_s.downcase === 'windows' and RUBY_PLATFORM =~ /msw
         if !model_id.nil?
 
           # Build the asset data obj
-          asset = [
+          asset = {
               :serial => serial,
               :name => hostname,
               :model_id => model_id
-          ]
+          }
           if os_name_field
-            asset[os_name_field.to_s.to_sym => os]
+            asset[os_name_field.to_s] = os
           end
           if os_version_field
-            asset[os_version_field.to_s.to_sym => os_ver]
+            asset[os_version_field.to_s] = os_ver
           end
 
           # If the asset does not already exist in Snipe
           if this_asset.nil?
             # Post a new asset
-            response = post_asset(base_url, token, asset)
+            response = post_asset(base_url, headers, asset)
           else
             # Update the asset
-            response = patch_asset(base_url, token, asset, this_asset['id'])
+            response = patch_asset(base_url, headers, asset, this_asset['id'])
           end
 
           # Log the status and response from Snipe
