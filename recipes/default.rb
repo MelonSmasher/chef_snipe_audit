@@ -24,7 +24,7 @@ def get_asset_by_serial(base_url, token, serial)
   HTTParty.get(
       "#{base_url}/hardware/byserial/#{serial}",
       verify: false,
-      :headers => {:Authorization => "Bearer #{token}", :Accept => "application/json", "Content-Type" => "application/json"}
+      headers: {:Authorization => "Bearer #{token}", :Accept => "application/json", "Content-Type" => "application/json"}
   )
 end
 
@@ -32,7 +32,7 @@ def get_asset_models(base_url, token)
   HTTParty.get(
       "#{base_url}/models?limit=500&sort=id&order=asc",
       verify: false,
-      :headers => {:Authorization => "Bearer #{token}", :Accept => "application/json", "Content-Type" => "application/json"}
+      headers: {:Authorization => "Bearer #{token}", :Accept => "application/json", "Content-Type" => "application/json"}
   )
 end
 
@@ -40,8 +40,8 @@ def post_asset(base_url, token, data)
   HTTParty.patch(
       "#{base_url}/hardware",
       verify: false,
-      :body => data,
-      :headers => {:Authorization => "Bearer #{token}", :Accept => "application/json", "Content-Type" => "application/json"}
+      body: data,
+      headers: {:Authorization => "Bearer #{token}", :Accept => "application/json", "Content-Type" => "application/json"}
   )
 end
 
@@ -49,8 +49,8 @@ def patch_asset(base_url, token, data, id)
   HTTParty.patch(
       "#{base_url}/hardware/#{id}",
       verify: false,
-      :body => data,
-      :headers => {:Authorization => "Bearer #{token}", :Accept => "application/json", "Content-Type" => "application/json"}
+      body: data,
+      headers: {:Authorization => "Bearer #{token}", :Accept => "application/json", "Content-Type" => "application/json"}
   )
 end
 
